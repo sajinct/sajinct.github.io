@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Kite Publisher HTML/Javascript trading buttons demo - Kite Connect trading APIs</title>
+	<meta charset="utf-8" />
+	<meta name="title" content="Kite Connect trading APIs">
+	<meta name="description" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<section>
+	<div class="common-iframe is-tv-chart js-tv-chart-wrapper">
+		<iframe src="https://tvc4.investing.com/init.php?pair_ID=17940&domain_ID=56&lang_ID=56&timezone_ID=23&refresh=6&session=session&interval=3&client=1&user=0&site=https://in.investing.com" width="100%" height="400"></iframe>
+	</div>
+	<br>
+</section>
+<section>
+	<h1>NIFTY SYSTEMS</h1>
+	<label for="cename">Nifty EXPIRY:</label>
+	<input type="text" id="expiry" name="expiry" value="NIFTY22JUN"><br><br>
+	<label for="pename">Nifty LOTS(x50):</label>
+	<input type="number" id="lots" name="lots" value="1"><br><br>
+	<label for="fname">Nifty Spot Price:</label>
+	<input type="number" id="nifty" name="nifty"><br><br>
+	<button onclick="process('sis')">SIS</button> 
+	<button onclick="process('t3')">T3</button> 
+	<button onclick="process('guts')">GUTS</button> 
+	<div id="trade-button"></div>	
+</section>
+<section>
+	<h1>SL</h1>
+	<label for="cename">Nifty CE:</label>
+	<input type="number" id="ce_price" name="ce_price"><br><br>
+	<label for="pename">Nifty PE:</label>
+	<input type="number" id="pe_price" name="pe_price"><br><br>
+	<button onclick="placesl()">SL</button> 
+	<div id="trade-sl-button"></div>	
+</section>
+
+<script src="https://kite.trade/publisher.js?v=1"></script>
+<script>
+callstrike = 0;
+putstrike = 0;
+sl=0;
+expiry= "NIFTY22JUN";
+qty = 50;
+function process(statergy)
+{
+	expiry = document.getElementById("expiry").value;
+	qty = document.getElementById("lots").value * 50;
+	nifty_ltp = document.getElementById("nifty").value;
+	if (statergy == "sis")
+	{
+		callstrike = (Math.round(nifty_ltp / 50) * 50);
+		putstrike = (Math.round(nifty_ltp / 50) * 50);
+		sl = 1.32;
+	}
+	if (statergy == "guts")
+	{
+		callstrike = (Math.round(nifty_ltp / 50) * 50)- 50;
+		putstrike = (Math.round(nifty_ltp / 50) * 50)+ 50;
+		sl= 1.4;
+	}
+	if (statergy == "t3")
+	{
+		callstrike = (Math.round(nifty_ltp / 50) * 50)+ 50;
+		putstrike = (Math.round(nifty_ltp / 50) * 50)- 50;
+		sl = 1.9;
+	}
+
+	var kite = new KiteConnect("7oo7z70yk7grgm5o");
+	kite.add({
+		//"variety": "amo",
+		"exchange": "NFO",
+		"tradingsymbol": expiry + callstrike + "CE",
+		"quantity": qty,
+		"transaction_type": "SELL",
+		"order_type": "MARKET",
+		"product": "NRML"
+	});
+	kite.add({
+		//"variety": "amo",
+		"exchange": "NFO",
+		"tradingsymbol": expiry + putstrike + "PE",
+		"quantity": qty,
+		"transaction_type": "SELL",
+		"order_type": "MARKET",
+		"product": "NRML"
+	});
+	document.getElementById("trade-button").innerHTML = "";
+	kite.renderButton("#trade-button");
+}
+
+function placesl()
+{
+
+	ce_price = document.getElementById("ce_price").value;
+	pe_price = document.getElementById("pe_price").value;
+
+	ce_price = ce_price * sl;
+	ce_price = Math.round(ce_price/0.05)*0.05;
+
+	pe_price = pe_price * sl;
+	pe_price = Math.round(pe_price/0.05)*0.05;
+
+	var kite = new KiteConnect("7oo7z70yk7grgm5o");
+	kite.add({
+		//"variety": "amo",
+		"exchange": "NFO",
+		"tradingsymbol": expiry + callstrike + "CE",
+		"quantity": qty,
+		"transaction_type": "BUY",
+		"order_type": "SL",
+		"product": "NRML",
+		"price" : Math.round((ce_price + 100)*100)/100,
+		"trigger_price" : Math.round(ce_price*100)/100 
+	});
+	kite.add({
+		//"variety": "amo",
+		"exchange": "NFO",
+		"tradingsymbol": expiry + putstrike + "PE",
+		"quantity": qty,
+		"transaction_type": "BUY",
+		"order_type": "SL",
+		"product": "NRML",
+		"price" : Math.round((pe_price + 100)*100)/100,
+		"trigger_price" : Math.round(pe_price*100)/100 
+	});
+	document.getElementById("trade-sl-button").innerHTML = "";
+	kite.renderButton("#trade-sl-button");
+
+}
+</script>
+</div>	
+</body>
+</html>
+
