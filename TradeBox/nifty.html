@@ -27,6 +27,7 @@
 	<input type="number" id="ce_price" name="ce_price"><br><br>
 	<label for="pename">Nifty PE:</label>
 	<input type="number" id="pe_price" name="pe_price"><br><br>
+	<input type="checkbox" id="amo"> Place Amo Order <br><br>
 	<button onclick="placesl()">SL</button> 
 	<div id="trade-sl-button"></div>	
 </section>
@@ -88,6 +89,10 @@ function process(statergy)
 function placesl()
 {
 
+	variety = "regular";
+	if(document.getElementById("amo").checked){
+		variety = "amo";
+	}
 	ce_price = document.getElementById("ce_price").value;
 	pe_price = document.getElementById("pe_price").value;
 
@@ -99,7 +104,7 @@ function placesl()
 
 	var kite = new KiteConnect("7oo7z70yk7grgm5o");
 	kite.add({
-		//"variety": "amo",
+		"variety": variety,
 		"exchange": "NFO",
 		"tradingsymbol": expiry + callstrike + "CE",
 		"quantity": qty,
@@ -110,7 +115,7 @@ function placesl()
 		"trigger_price" : Math.round(ce_price*100)/100 
 	});
 	kite.add({
-		//"variety": "amo",
+		"variety": variety,
 		"exchange": "NFO",
 		"tradingsymbol": expiry + putstrike + "PE",
 		"quantity": qty,
