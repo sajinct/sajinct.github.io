@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>PyScript Hello World</title>
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+        - pandas
+        - urllib
+        - ssl
+    </py-env>
+  </head>
+
+  <body>
+    Hello world! <br>
+    This is the current date and time, as computed by Python:
+    <py-script>
+import json
+import datetime
+import pandas as pd
+
+TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNjU4MTE2NDMwLCJ0b2tlbkNvbnN1bWVyVHlwZSI6IlNFTEYiLCJkaGFuQ2xpZW50SWQiOiIxMDAwNTc5OTEzIn0.mj9XA7wDOJT54KfTrSRsCL4ijL-EpK-NZiwXVzcWHq16DlFLBUrROTC4b0izuI5Jzxo7S4bbaDTUV-jQLKHSUw"
+
+def nifty_close():
+    url = "https://api.dhan.co/charts/intraday"
+    payload = {
+        "securityId": "13",
+        "exchangeSegment": "IDX_I",
+        "instrument": "INDEX"
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "access-token": TOKEN
+    }
+    response = requests.request("POST", url, json=payload, headers=headers)
+    data =  json.loads(response.text)
+    return(round(data['close'][len(data['close'])-1],2))
+
+nifty_close()
+    </py-script>
+  </body>
+</html>
