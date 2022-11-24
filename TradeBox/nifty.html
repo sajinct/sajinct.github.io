@@ -111,7 +111,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" : Math.round((ce_price + 50)*100)/100,
+		"price" : Math.round((ce_price + (ce_price*39/100))*100)/100,
 		"trigger_price" : Math.round(ce_price*100)/100 
 	});
 	kite.add({
@@ -122,7 +122,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" : Math.round((pe_price + 50)*100)/100,
+		"price" : Math.round((pe_price + (pe_price))*100)/100,
 		"trigger_price" : Math.round(pe_price*100)/100 
 	});
 	document.getElementById("trade-sl-button").innerHTML = "";
