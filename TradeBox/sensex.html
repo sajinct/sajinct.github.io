@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SENSEX TradeBox</title>
+	<meta charset="utf-8" />
+	<meta name="title" content="TradeBox">
+	<meta name="description" content="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<section>
+	<h1>SENSEX SYSTEMS</h1>
+	<label for="cename">SENSEX EXPIRY:</label>
+	<input type="text" id="expiry" name="expiry" value="SENSEX23922"><br><br>
+	<label for="pename">SENSEX LOTS(x10):</label>
+	<input type="number" id="lots" name="lots" value="3"><br><br>
+	<label for="fname">SENSEX Spot Price:</label>
+	<input type="number" id="bnf" name="bnf"><br><br>
+	<button onclick="process('aws')">AWS</button> 
+	<button onclick="process('t3')">T3</button> 
+	<button onclick="process('guts')">GUTS</button> 
+	<div id="trade-button"></div>	
+</section>
+<section>
+	<h1>SL</h1>
+	<label for="cename">SENSEX CE:</label>
+	<input type="number" id="ce_price" name="ce_price"><br><br>
+	<label for="pename">SENSEX PE:</label>
+	<input type="number" id="pe_price" name="pe_price"><br><br>
+	<input type="checkbox" id="amo"> Place Amo Order <br><br>
+	<button onclick="placesl()">SL</button> 
+	<div id="trade-sl-button"></div>	
+</section>
+
+<script src="https://kite.trade/publisher.js?v=1"></script>
+<script>
+callstrike = 0;
+putstrike = 0;
+sl=0;
+expiry= "SENSEX23922";
+qty = 10;
+function process(statergy)
+{
+	expiry = document.getElementById("expiry").value;
+	qty = document.getElementById("lots").value * 10;
+	nifty_ltp = document.getElementById("bnf").value;
+	if (statergy == "aws")
+	{
+		callstrike = (Math.round(nifty_ltp / 100) * 100);
+		putstrike = (Math.round(nifty_ltp / 100) * 100);
+		sl = 1.32;
+	}
+	if (statergy == "guts")
+	{
+		callstrike = (Math.round(nifty_ltp / 100) * 100)- 100;
+		putstrike = (Math.round(nifty_ltp / 100) * 100)+ 100;
+		sl= 1.4;
+	}
+	if (statergy == "t3")
+	{
+		callstrike = (Math.round(nifty_ltp / 100) * 100)+ 100;
+		putstrike = (Math.round(nifty_ltp / 100) * 100)- 100;
+		sl = 1.9;
+	}
+
+	var kite = new KiteConnect("7oo7z70yk7grgm5o");
+	kite.add({
+		//"variety": "amo",
+		"exchange": "BFO",
+		"tradingsymbol": expiry + callstrike + "CE",
+		"quantity": qty,
+		"transaction_type": "SELL",
+		"order_type": "MARKET",
+		"product": "NRML"
+	});
+	kite.add({
+		//"variety": "amo",
+		"exchange": "BFO",
+		"tradingsymbol": expiry + putstrike + "PE",
+		"quantity": qty,
+		"transaction_type": "SELL",
+		"order_type": "MARKET",
+		"product": "NRML"
+	});
+	document.getElementById("trade-button").innerHTML = "";
+	kite.renderButton("#trade-button");
+}
+
+function placesl()
+{
+	variety = "regular";
+	if(document.getElementById("amo").checked){
+		variety = "amo";
+	}
+	ce_price = document.getElementById("ce_price").value;
+	pe_price = document.getElementById("pe_price").value;
+
+	ce_price = ce_price * sl;
+	ce_price = Math.round(ce_price/0.05)*0.05;
+
+	pe_price = pe_price * sl;
+	pe_price = Math.round(pe_price/0.05)*0.05;
+
+	var kite = new KiteConnect("7oo7z70yk7grgm5o");
+	kite.add({
+		"variety": variety,
+		"exchange": "BFO",
+		"tradingsymbol": expiry + callstrike + "CE",
+		"quantity": qty,
+		"transaction_type": "BUY",
+		"order_type": "SL",
+		"product": "NRML",
+		"price" : Math.round((ce_price + 20)*100)/100,
+		"trigger_price" : Math.round(ce_price*100)/100 
+	});
+	kite.add({
+		"variety": variety,
+		"exchange": "BFO",
+		"tradingsymbol": expiry + putstrike + "PE",
+		"quantity": qty,
+		"transaction_type": "BUY",
+		"order_type": "SL",
+		"product": "NRML",
+		"price" : Math.round((pe_price + 20)*100)/100,
+		"trigger_price" : Math.round(pe_price*100)/100 
+	});
+	document.getElementById("trade-sl-button").innerHTML = "";
+	kite.renderButton("#trade-sl-button");
+
+}
+</script>
+
+</body>
+</html>
