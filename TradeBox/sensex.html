@@ -11,9 +11,9 @@
 <section>
 	<h1>SENSEX SYSTEMS</h1>
 	<label for="cename">SENSEX EXPIRY:</label>
-	<input type="text" id="expiry" name="expiry" value="SENSEX23922"><br><br>
+	<input type="text" id="expiry" name="expiry" value="SENSEX23SEP"><br><br>
 	<label for="pename">SENSEX LOTS(x10):</label>
-	<input type="number" id="lots" name="lots" value="3"><br><br>
+	<input type="number" id="lots" name="lots" value="6"><br><br>
 	<label for="fname">SENSEX Spot Price:</label>
 	<input type="number" id="bnf" name="bnf"><br><br>
 	<button onclick="process('aws')">AWS</button> 
@@ -37,7 +37,7 @@
 callstrike = 0;
 putstrike = 0;
 sl=0;
-expiry= "SENSEX23922";
+expiry= "SENSEX23SEP";
 qty = 10;
 function process(statergy)
 {
