@@ -11,7 +11,7 @@
 <section>
 	<h1>FINNIFTY SYSTEMS</h1>
 	<label for="cename">FINNIFTY EXPIRY:</label>
-	<input type="text" id="expiry" name="expiry" value="FINNIFTY23SEP"><br><br>
+	<input type="text" id="expiry" name="expiry" value="FINNIFTY23O03"><br><br>
 	<label for="pename">FINNIFTY LOTS(x40):</label>
 	<input type="number" id="lots" name="lots" value="5"><br><br>
 	<label for="fname">FINNIFTY Spot Price:</label>
@@ -37,7 +37,7 @@
 callstrike = 0;
 putstrike = 0;
 sl=0;
-expiry= "FINNIFTY23SEP";
+expiry= "FINNIFTY23O03";
 qty = 40;
 function process(statergy)
 {
@@ -110,7 +110,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" : Math.round((ce_price + 20)*100)/100,
+		"price" : Math.round((ce_price + 05)*100)/100,
 		"trigger_price" : Math.round(ce_price*100)/100 
 	});
 	kite.add({
@@ -121,7 +121,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" : Math.round((pe_price + 20)*100)/100,
+		"price" : Math.round((pe_price + 05)*100)/100,
 		"trigger_price" : Math.round(pe_price*100)/100 
 	});
 	document.getElementById("trade-sl-button").innerHTML = "";
