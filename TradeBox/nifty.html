@@ -11,9 +11,9 @@
 <section>
 	<h1>NIFTY SYSTEMS</h1>
 	<label for="cename">Nifty EXPIRY:</label>
-	<input type="text" id="expiry" name="expiry" value="NIFTY23608"><br><br>
+	<input type="text" id="expiry" name="expiry" value="NIFTY23O05"><br><br>
 	<label for="pename">Nifty LOTS(x50):</label>
-	<input type="number" id="lots" name="lots" value="3"><br><br>
+	<input type="number" id="lots" name="lots" value="5"><br><br>
 	<label for="fname">Nifty Spot Price:</label>
 	<input type="number" id="nifty" name="nifty"><br><br>
 	<button onclick="process('sis')">SIS</button> 
@@ -37,7 +37,7 @@
 callstrike = 0;
 putstrike = 0;
 sl=0;
-expiry= "NIFTY23608;
+expiry= "NIFTY23O05;
 qty = 50;
 function process(statergy)
 {
@@ -54,7 +54,7 @@ function process(statergy)
 	{
 		callstrike = (Math.round(nifty_ltp / 50) * 50)- 50;
 		putstrike = (Math.round(nifty_ltp / 50) * 50)+ 50;
-		sl= 1.5;
+		sl= 1.4;
 	}
 	if (statergy == "t3")
 	{
