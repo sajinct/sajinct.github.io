@@ -102,6 +102,9 @@ function placesl()
 	pe_price = pe_price * sl;
 	pe_price = Math.round(pe_price/0.05)*0.05;
 
+	pegap = Math.round((pe_price * 1.1)/0.05)*0.05;
+	cegap = Math.round((ce_price * 1.1)/0.05)*0.05;
+
 	var kite = new KiteConnect("7oo7z70yk7grgm5o");
 	kite.add({
 		"variety": variety,
@@ -111,7 +114,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" :Math.round((Math.round((ce_price + (ce_price*10/100))*100)/100) / 0.05) * 0.05 ,
+		"price" :Math.round((ce_price + cegap)*100)/100,
 		"trigger_price" : Math.round(ce_price*100)/100 
 	});
 	kite.add({
@@ -122,7 +125,7 @@ function placesl()
 		"transaction_type": "BUY",
 		"order_type": "SL",
 		"product": "NRML",
-		"price" : Math.round((Math.round((pe_price + (pe_price*10/100))*100)/100) / 0.05) * 0.05,
+		"price" : Math.round((pe_price + pegap)*100)/100,
 		"trigger_price" : Math.round(pe_price*100)/100 
 	});
 	document.getElementById("trade-sl-button").innerHTML = "";
