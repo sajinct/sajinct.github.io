@@ -6,6 +6,8 @@
 	<meta name="title" content="TradeBox">
 	<meta name="description" content="" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<!-- Compiled and minified CSS -->
+    	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
 <body>
 <section>
@@ -16,9 +18,9 @@
 	<input type="number" id="lots" name="lots" value="6"><br><br>
 	<label for="fname">BANK Nifty Spot Price:</label>
 	<input type="number" id="bnf" name="bnf"><br><br>
-	<button onclick="process('aws')">AWS</button> 
-	<button onclick="process('t3')">T3</button> 
-	<button onclick="process('guts')">GUTS</button> 
+	<button class="waves-effect waves-light btn" onclick="process('aws')">AWS</button> 
+	<button class="waves-effect waves-light btn" onclick="process('t3')">T3</button> 
+	<button class="waves-effect waves-light btn" onclick="process('guts')">GUTS</button> 
 	<div id="trade-button"></div>	
 </section>
 <section>
@@ -28,9 +30,12 @@
 	<label for="pename">BNF PE:</label>
 	<input type="number" id="pe_price" name="pe_price"><br><br>
 	<input type="checkbox" id="amo"> Place Amo Order <br><br>
-	<button onclick="placesl()">SL</button> 
+	<button class="waves-effect waves-light btn" onclick="placesl()">SL</button> 
 	<div id="trade-sl-button"></div>	
 </section>
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
 <script src="https://kite.trade/publisher.js?v=1"></script>
 <script>
