@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sound Identifier</title>
+<title>Speech Recognizer</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<h1>Sound Identifier</h1>
+<h1>Speech Recognizer</h1>
 
 <button id="startButton">Start Listening</button>
 <button id="stopButton" disabled>Stop Listening</button>
@@ -24,171 +24,44 @@
 <div id="result"></div>
 
 <script>
-  let audioContext;
-  let recorder;
+  let recognition;
 
   const startButton = document.getElementById('startButton');
   const stopButton = document.getElementById('stopButton');
   const resultDiv = document.getElementById('result');
 
-  startButton.addEventListener('click', startRecording);
-  stopButton.addEventListener('click', stopRecording);
+  startButton.addEventListener('click', startRecognition);
+  stopButton.addEventListener('click', stopRecognition);
 
-  function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(function(stream) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const audioStream = audioContext.createMediaStreamSource(stream);
-        recorder = new Recorder(audioStream);
+  function startRecognition() {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-        startButton.disabled = true;
-        stopButton.disabled = false;
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      resultDiv.textContent = `You said: ${transcript}`;
+    }
 
-        recorder.record();
-      })
-      .catch(function(err) {
-        console.error('Error accessing microphone', err);
-      });
+    recognition.onend = function() {
+      startButton.disabled = false;
+      stopButton.disabled = true;
+    }
+
+    recognition.onerror = function(event) {
+      console.error('Speech recognition error:', event.error);
+    }
+
+    startButton.disabled = true;
+    stopButton.disabled = false;
+
+    recognition.start();
   }
 
-  function stopRecording() {
-    recorder.stop();
-    audioContext.close();
-
-    recorder.exportWAV(function(blob) {
-      processAudio(blob);
-    });
-
-    startButton.disabled = false;
-    stopButton.disabled = true;
+  function stopRecognition() {
+    recognition.stop();
   }
-
-  function processAudio(blob) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const audioData = event.target.result;
-
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      audioContext.decodeAudioData(audioData, function(decodedData) {
-        // Process decoded audio data here
-        identifySound(decodedData);
-      });
-    };
-
-    reader.readAsArrayBuffer(blob);
-  }
-
-  function identifySound(decodedData) {
-    // This is where you can analyze the sound to identify it
-    // For simplicity, let's just display the duration
-    const duration = decodedData.duration;
-    const resultText = `Sound duration: ${duration.toFixed(2)} seconds`;
-    resultDiv.textContent = resultText;
-  }
-</script>
-
-<script>
-  // Recorder.js - https://github.com/mattdiamond/Recorderjs
-
-  function __log(e, data) {
-    console.log(e + " " + (data || ''));
-  }
-
-  var Recorder = function(source, cfg) {
-    var config = cfg || {};
-    var bufferLen = config.bufferLen || 4096;
-    var numChannels = config.numChannels || 2;
-
-    this.context = source.context;
-    if (!this.context.createScriptProcessor) {
-      this.node = this.context.createJavaScriptNode(bufferLen, numChannels, numChannels);
-    } else {
-      this.node = this.context.createScriptProcessor(bufferLen, numChannels, numChannels);
-    }
-
-    var worker = new Worker(config.workerPath || 'js/recorderWorker.js');
-    worker.postMessage({
-      command: 'init',
-      config: {
-        sampleRate: this.context.sampleRate,
-        numChannels: numChannels
-      }
-    });
-    var recording = false,
-      currCallback;
-
-    this.node.onaudioprocess = function(e) {
-      if (!recording) return;
-      var buffer = [];
-      for (var channel = 0; channel < numChannels; channel++) {
-        buffer.push(e.inputBuffer.getChannelData(channel));
-      }
-      worker.postMessage({
-        command: 'record',
-        buffer: buffer
-      });
-    }
-
-    this.configure = function(cfg) {
-      for (var prop in cfg) {
-        if (cfg.hasOwnProperty(prop)) {
-          config[prop] = cfg[prop];
-        }
-      }
-    }
-
-    this.record = function() {
-      recording = true;
-    }
-
-    this.stop = function() {
-      recording = false;
-    }
-
-    this.clear = function() {
-      worker.postMessage({
-        command: 'clear'
-      });
-    }
-
-    this.getBuffer = function(cb) {
-      currCallback = cb || config.callback;
-      worker.postMessage({
-        command: 'getBuffer'
-      });
-    }
-
-    this.exportWAV = function(cb, type) {
-      currCallback = cb || config.callback;
-      type = type || config.type || 'audio/wav';
-      if (!currCallback) throw new Error('Callback not set');
-      worker.postMessage({
-        command: 'exportWAV',
-        type: type
-      });
-    }
-
-    worker.onmessage = function(e) {
-      var blob = e.data;
-      currCallback(blob);
-    }
-
-    source.connect(this.node);
-    this.node.connect(this.context.destination); //this should not be necessary
-  };
-
-  Recorder.forceDownload = function(blob, filename) {
-    var url = (window.URL || window.webkitURL).createObjectURL(blob);
-    var link = window.document.createElement('a');
-    link.href = url;
-    link.download = filename || 'output.wav';
-    var click = document.createEvent("Event");
-    click.initEvent("click", true, true);
-    link.dispatchEvent(click);
-  }
-
-  window.Recorder = Recorder;
 </script>
 
 </body>
