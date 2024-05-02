@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Identifier</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #audioInput {
+    margin: 20px;
+  }
+  #result {
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sound Identifier</h1>
+
+<input type="file" id="audioInput" accept="audio/*">
+
+<div id="result"></div>
+
+<script>
+  const audioInput = document.getElementById('audioInput');
+  const resultDiv = document.getElementById('result');
+
+  audioInput.addEventListener('change', function() {
+    const file = this.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioData = event.target.result;
+
+      audioContext.decodeAudioData(audioData, function(decodedData) {
+        // Process decoded audio data here
+        identifySound(decodedData);
+      });
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+
+  function identifySound(decodedData) {
+    // This is where you can analyze the sound to identify it
+    // For simplicity, let's just display the duration
+    const duration = decodedData.duration;
+    const resultText = `Sound duration: ${duration.toFixed(2)} seconds`;
+    resultDiv.textContent = resultText;
+  }
+</script>
+
+</body>
+</html>
