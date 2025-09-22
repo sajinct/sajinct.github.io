@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gyro Orientation Logger</title>
+</head>
+<body>
+  <h1>Device Orientation</h1>
+  <pre id="output">Waiting for sensor data...</pre>
+  <script>
+    function handleOrientation(event) {
+      document.getElementById('output').textContent =
+        'alpha (Z): ' + event.alpha + '\n' +
+        'beta (X): ' + event.beta + '\n' +
+        'gamma (Y): ' + event.gamma;
+    }
+    window.addEventListener('deviceorientation', handleOrientation, true);
+  </script>
+</body>
+</html>
