@@ -106,6 +106,7 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 3px solid #667eea;
+            text-align: center; /* keep Course Index title center aligned */
         }
 
         .tutorial-list {
@@ -132,30 +133,48 @@
             border-left: 4px solid #28a745;
         }
 
+        /* Layout for lesson row: checkbox on left, lesson number above title on the right */
         .checkbox-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto auto;
+            gap: 8px 12px;
             align-items: center;
             cursor: pointer;
             flex: 1;
         }
 
+        /* Checkbox sits to the left and spans both rows */
         .checkbox {
             width: 24px;
             height: 24px;
-            margin-right: 15px;
+            margin: 0; /* spacing handled by grid gap */
             cursor: pointer;
             accent-color: #667eea;
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            align-self: center;
         }
 
+        /* Number on the first row */
         .tutorial-number {
             font-weight: bold;
             color: #667eea;
-            min-width: 60px;
+            grid-column: 2;
+            grid-row: 1;
+            display: block;
+            margin: 0;
         }
 
+        /* Title on the second row */
         .tutorial-title {
-            flex: 1;
             color: #333;
+            grid-column: 2;
+            grid-row: 2;
+            display: block;
+            margin: 0;
+            font-size: 0.98rem;
+            line-height: 1.2;
         }
 
         .tutorial-item.completed .tutorial-title {
@@ -183,12 +202,15 @@
             background: #dc3545;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1em;
+            padding: 10px 18px; /* a bit smaller */
+            border-radius: 6px;
+            font-size: 0.9em;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 16px;
             transition: background 0.3s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto; /* center the reset button */
         }
 
         .reset-button:hover {
@@ -345,13 +367,44 @@
                 justify-content: center;
             }
         }
+
+        /* Small screen adjustments for two-line layout and touch friendliness */
+        @media (max-width: 480px) {
+            .tutorial-item {
+                padding: 10px;
+            }
+
+            .tutorial-number {
+                font-size: 0.95rem;
+            }
+
+            .tutorial-title {
+                font-size: 0.95rem;
+            }
+
+            .video-button {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                margin-left: 8px;
+            }
+
+            .checkbox {
+                width: 20px;
+                height: 20px;
+            }
+
+            .section {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>📚 Krita Course for Beginners</h1>
-            <p>35-Part Tutorial Series - Track Your Progress</p>
+            <p>35-Part Tutorial Series</p>
         </div>
 
         <div class="progress-overview">
@@ -666,7 +719,6 @@
         <div class="footer">
             <p>Source: <a href="https://krita-artists.org/t/35-part-krita-course-for-kids-but-i-think-not-only-suitable-for-children/36865" target="_blank">Krita Artists Community</a></p>
             <p>Channel: <a href="https://www.youtube.com/@conartistvids" target="_blank">conartistvids on YouTube</a></p>
-            <p>Progress is saved in your browser's local storage</p>
         </div>
     </div>
 
@@ -681,12 +733,9 @@
                 <iframe id="videoFrame" class="video-frame" src="" allowfullscreen></iframe>
             </div>
             <div class="video-controls">
-                <button class="control-button" id="prevButton" onclick="previousVideo()" disabled>◀ Previous</button>
+                <button class="control-button" id="prevButton" onclick="previousVideo()" disabled>◀ Prev</button>
                 <button class="control-button" id="markButton" onclick="toggleMarkFromModal()">✓ Mark Complete</button>
                 <button class="control-button" id="nextButton" onclick="nextVideo()">Next ▶</button>
-            </div>
-            <div class="lesson-info" id="lessonInfo">
-                Press ESC to close video player
             </div>
         </div>
     </div>
