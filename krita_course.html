@@ -397,6 +397,28 @@
                 padding-left: 12px;
                 padding-right: 12px;
             }
+            /* On small/mobile screens remove the decorative background and make container full-bleed */
+            body {
+                background: none; /* remove gradient */
+                background-color: #f8f9fa; /* subtle neutral fallback */
+                padding: 0; /* let container be full width */
+            }
+
+            .container {
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+                border-radius: 0; /* square edges for full-width */
+                box-shadow: none; /* remove shadow for edge-to-edge feel */
+            }
+
+            .header {
+                padding: 18px 16px;
+            }
+
+            .content {
+                padding: 12px;
+            }
         }
     </style>
 </head>
