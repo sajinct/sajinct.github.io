@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krita Course - Progress Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .progress-overview {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .progress-bar-container {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tutorial-list {
+            list-style: none;
+        }
+
+        .tutorial-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tutorial-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .tutorial-item.completed {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .tutorial-number {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .tutorial-title {
+            flex: 1;
+            color: #333;
+        }
+
+        .tutorial-item.completed .tutorial-title {
+            color: #155724;
+        }
+
+        .video-button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .video-button:hover {
+            background: #5568d3;
+        }
+
+        .reset-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background: #c82333;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .close-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: #c82333;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .video-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: #5568d3;
+        }
+
+        .control-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .lesson-info {
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 10px;
+            }
+
+            .modal-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .modal-title {
+                font-size: 1.2em;
+            }
+
+            .video-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Krita Course for Beginners</h1>
+            <p>35-Part Tutorial Series - Track Your Progress</p>
+        </div>
+
+        <div class="progress-overview">
+            <div class="progress-stats">
+                <div class="stat">
+                    <div class="stat-value" id="completed-count">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="remaining-count">35</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="percentage">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">Course Index</h2>
+                <ul class="tutorial-list" id="tutorial-list">                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(1)">
+                            <input type="checkbox" class="checkbox" id="tutorial-1" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 01</span>
+                            <span class="tutorial-title">Getting started</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('rVMPAFjk0-0', 'Lesson 01: Getting started', 1)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(2)">
+                            <input type="checkbox" class="checkbox" id="tutorial-2" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 02</span>
+                            <span class="tutorial-title">Basic navigation</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+02+basic+navigation', 'Lesson 02: Basic navigation', 2)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(3)">
+                            <input type="checkbox" class="checkbox" id="tutorial-3" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 03</span>
+                            <span class="tutorial-title">Intro to painting</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('FhFCyOrlgSE', 'Lesson 03: Intro to painting', 3)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(4)">
+                            <input type="checkbox" class="checkbox" id="tutorial-4" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 04</span>
+                            <span class="tutorial-title">Paint an apple part 1</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+04+paint+an+apple+part+1', 'Lesson 04: Paint an apple part 1', 4)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(5)">
+                            <input type="checkbox" class="checkbox" id="tutorial-5" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 05</span>
+                            <span class="tutorial-title">Paint an apple part 2</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('Cn1GdF0_Cm0', 'Lesson 05: Paint an apple part 2', 5)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(6)">
+                            <input type="checkbox" class="checkbox" id="tutorial-6" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 06</span>
+                            <span class="tutorial-title">Paint an apple part 3</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+06+paint+an+apple+part+3', 'Lesson 06: Paint an apple part 3', 6)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(7)">
+                            <input type="checkbox" class="checkbox" id="tutorial-7" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 07</span>
+                            <span class="tutorial-title">Adding leaves to blue berries</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+07+Adding+leaves+to+blue+berries', 'Lesson 07: Adding leaves to blue berries', 7)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(8)">
+                            <input type="checkbox" class="checkbox" id="tutorial-8" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 08</span>
+                            <span class="tutorial-title">Adding a shadow to blueberries</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+08+Adding+a+shadow+to+blueberries', 'Lesson 08: Adding a shadow to blueberries', 8)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(9)">
+                            <input type="checkbox" class="checkbox" id="tutorial-9" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 09</span>
+                            <span class="tutorial-title">Saving favourite brushes to a TAG</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+09+Saving+favourite+brushes+to+a+TAG', 'Lesson 09: Saving favourite brushes to a TAG', 9)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(10)">
+                            <input type="checkbox" class="checkbox" id="tutorial-10" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 10</span>
+                            <span class="tutorial-title">The Pop Up Palette</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+10+The+Pop+Up+Palette', 'Lesson 10: The Pop Up Palette', 10)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(11)">
+                            <input type="checkbox" class="checkbox" id="tutorial-11" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 11</span>
+                            <span class="tutorial-title">Preparing lineart for painting</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+11+Preparing+lineart+for+painting', 'Lesson 11: Preparing lineart for painting', 11)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(12)">
+                            <input type="checkbox" class="checkbox" id="tutorial-12" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 12</span>
+                            <span class="tutorial-title">Painting with lineart</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+12+Painting+with+lineart', 'Lesson 12: Painting with lineart', 12)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(13)">
+                            <input type="checkbox" class="checkbox" id="tutorial-13" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 13</span>
+                            <span class="tutorial-title">Saving your artwork</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('eOItVaFS3ek', 'Lesson 13: Saving your artwork', 13)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(14)">
+                            <input type="checkbox" class="checkbox" id="tutorial-14" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 14</span>
+                            <span class="tutorial-title">Using reference photos in Krita</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('BgQyVA0QKQI', 'Lesson 14: Using reference photos in Krita', 14)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(15)">
+                            <input type="checkbox" class="checkbox" id="tutorial-15" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 15</span>
+                            <span class="tutorial-title">Face painting - creating a mirror image</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+15+Face+painting+creating+a+mirror+image', 'Lesson 15: Face painting - creating a mirror image', 15)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(16)">
+                            <input type="checkbox" class="checkbox" id="tutorial-16" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 16</span>
+                            <span class="tutorial-title">Face painting - using the Fill tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+16+Face+painting+using+the+Fill+tool', 'Lesson 16: Face painting - using the Fill tool', 16)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(17)">
+                            <input type="checkbox" class="checkbox" id="tutorial-17" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 17</span>
+                            <span class="tutorial-title">Face painting - Colorize Mask tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+17+Face+painting+Colorize+Mask+tool', 'Lesson 17: Face painting - Colorize Mask tool', 17)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(18)">
+                            <input type="checkbox" class="checkbox" id="tutorial-18" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 18</span>
+                            <span class="tutorial-title">Face painting - Adding gradients + patterns</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+18+Face+painting+Adding+gradients+patterns', 'Lesson 18: Face painting - Adding gradients + patterns', 18)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(19)">
+                            <input type="checkbox" class="checkbox" id="tutorial-19" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 19</span>
+                            <span class="tutorial-title">Face painting - changing line colour</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+19+Face+painting+changing+line+colour', 'Lesson 19: Face painting - changing line colour', 19)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(20)">
+                            <input type="checkbox" class="checkbox" id="tutorial-20" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 20</span>
+                            <span class="tutorial-title">Selecting a shape from a photo</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+20+selecting+a+shape+from+a+photo', 'Lesson 20: Selecting a shape from a photo', 20)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(21)">
+                            <input type="checkbox" class="checkbox" id="tutorial-21" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 21</span>
+                            <span class="tutorial-title">Blending colours with wet brushes</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+21+Blending+colours+with+wet+brushes', 'Lesson 21: Blending colours with wet brushes', 21)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(22)">
+                            <input type="checkbox" class="checkbox" id="tutorial-22" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 22</span>
+                            <span class="tutorial-title">Importing reference photos the proper way</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+22+Importing+reference+photos+the+proper+way', 'Lesson 22: Importing reference photos the proper way', 22)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(23)">
+                            <input type="checkbox" class="checkbox" id="tutorial-23" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 23</span>
+                            <span class="tutorial-title">Tracing over a photo method 1</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+23+Tracing+over+a+photo+method+1', 'Lesson 23: Tracing over a photo method 1', 23)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(24)">
+                            <input type="checkbox" class="checkbox" id="tutorial-24" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 24</span>
+                            <span class="tutorial-title">Tracing over a photo method 2</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+24+Tracing+over+a+photo+method+2', 'Lesson 24: Tracing over a photo method 2', 24)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(25)">
+                            <input type="checkbox" class="checkbox" id="tutorial-25" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 25</span>
+                            <span class="tutorial-title">Tracing over a photo method 3</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+25+Tracing+over+a+photo+method+3', 'Lesson 25: Tracing over a photo method 3', 25)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(26)">
+                            <input type="checkbox" class="checkbox" id="tutorial-26" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 26</span>
+                            <span class="tutorial-title">Using the fantastic Mirror function</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+26+Using+the+fantastic+Mirror+function', 'Lesson 26: Using the fantastic Mirror function', 26)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(27)">
+                            <input type="checkbox" class="checkbox" id="tutorial-27" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 27</span>
+                            <span class="tutorial-title">Using the amazing Multi brush tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+27+Using+the+amazing+Multi+brush+tool', 'Lesson 27: Using the amazing Multi brush tool', 27)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(28)">
+                            <input type="checkbox" class="checkbox" id="tutorial-28" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 28</span>
+                            <span class="tutorial-title">Introduction to vector lines and shapes</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+28+Introduction+to+vector+lines+and+shapes', 'Lesson 28: Introduction to vector lines and shapes', 28)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(29)">
+                            <input type="checkbox" class="checkbox" id="tutorial-29" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 29</span>
+                            <span class="tutorial-title">The Freehand Path tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+29+The+Freehand+Path+tool', 'Lesson 29: The Freehand Path tool', 29)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(30)">
+                            <input type="checkbox" class="checkbox" id="tutorial-30" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 30</span>
+                            <span class="tutorial-title">Paintbrush versus Path tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+30+Paintbrush+versus+Path+tool', 'Lesson 30: Paintbrush versus Path tool', 30)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(31)">
+                            <input type="checkbox" class="checkbox" id="tutorial-31" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 31</span>
+                            <span class="tutorial-title">Vector Portrait Part 1 Elvis</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('dQq1a0KjzRk', 'Lesson 31: Vector Portrait Part 1 Elvis', 31)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(32)">
+                            <input type="checkbox" class="checkbox" id="tutorial-32" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 32</span>
+                            <span class="tutorial-title">Vector Portrait Part 2 Elvis</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+32+Vector+Portrait+Part+2+Elvis', 'Lesson 32: Vector Portrait Part 2 Elvis', 32)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(33)">
+                            <input type="checkbox" class="checkbox" id="tutorial-33" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 33</span>
+                            <span class="tutorial-title">Vector Portrait Part 3 Elvis</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('HpEBoNMGbd0', 'Lesson 33: Vector Portrait Part 3 Elvis', 33)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(34)">
+                            <input type="checkbox" class="checkbox" id="tutorial-34" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 34</span>
+                            <span class="tutorial-title">Having fun with the Type tool</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+34+Having+fun+with+the+Type+tool', 'Lesson 34: Having fun with the Type tool', 34)">▶ Watch</button>
+                    </li>
+                    <li class="tutorial-item">
+                        <div class="checkbox-container" onclick="toggleComplete(35)">
+                            <input type="checkbox" class="checkbox" id="tutorial-35" onchange="updateProgress()" onclick="event.stopPropagation()">
+                            <span class="tutorial-number">Lesson 35</span>
+                            <span class="tutorial-title">Exporting for PRINT and SCREEN</span>
+                        </div>
+                        <button class="video-button" onclick="playVideo('search_conartistvids+Krita+35+Exporting+for+PRINT+and+SCREEN', 'Lesson 35: Exporting for PRINT and SCREEN', 35)">▶ Watch</button>
+                    </li>
+                </ul>
+                <button class="reset-button" onclick="resetProgress()">Reset All Progress</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Source: <a href="https://krita-artists.org/t/35-part-krita-course-for-kids-but-i-think-not-only-suitable-for-children/36865" target="_blank">Krita Artists Community</a></p>
+            <p>Channel: <a href="https://www.youtube.com/@conartistvids" target="_blank">conartistvids on YouTube</a></p>
+            <p>Progress is saved in your browser's local storage</p>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Video Player</div>
+                <button class="close-button" onclick="closeVideo()">✕ Close</button>
+            </div>
+            <div class="video-container">
+                <iframe id="videoFrame" class="video-frame" src="" allowfullscreen></iframe>
+            </div>
+            <div class="video-controls">
+                <button class="control-button" id="prevButton" onclick="previousVideo()" disabled>◀ Previous</button>
+                <button class="control-button" onclick="markCompleted()">✓ Mark Complete</button>
+                <button class="control-button" id="nextButton" onclick="nextVideo()">Next ▶</button>
+            </div>
+            <div class="lesson-info" id="lessonInfo">
+                Press ESC to close video player
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentVideoId = null;
+        let currentLessonId = null;
+
+        // Video data for navigation
+        const videoData = [{"id": 1, "title": "Getting started", "video_id": "rVMPAFjk0-0"}, {"id": 2, "title": "Basic navigation", "video_id": "search_conartistvids+Krita+02+basic+navigation"}, {"id": 3, "title": "Intro to painting", "video_id": "FhFCyOrlgSE"}, {"id": 4, "title": "Paint an apple part 1", "video_id": "search_conartistvids+Krita+04+paint+an+apple+part+1"}, {"id": 5, "title": "Paint an apple part 2", "video_id": "Cn1GdF0_Cm0"}, {"id": 6, "title": "Paint an apple part 3", "video_id": "search_conartistvids+Krita+06+paint+an+apple+part+3"}, {"id": 7, "title": "Adding leaves to blue berries", "video_id": "search_conartistvids+Krita+07+Adding+leaves+to+blue+berries"}, {"id": 8, "title": "Adding a shadow to blueberries", "video_id": "search_conartistvids+Krita+08+Adding+a+shadow+to+blueberries"}, {"id": 9, "title": "Saving favourite brushes to a TAG", "video_id": "search_conartistvids+Krita+09+Saving+favourite+brushes+to+a+TAG"}, {"id": 10, "title": "The Pop Up Palette", "video_id": "search_conartistvids+Krita+10+The+Pop+Up+Palette"}, {"id": 11, "title": "Preparing lineart for painting", "video_id": "search_conartistvids+Krita+11+Preparing+lineart+for+painting"}, {"id": 12, "title": "Painting with lineart", "video_id": "search_conartistvids+Krita+12+Painting+with+lineart"}, {"id": 13, "title": "Saving your artwork", "video_id": "eOItVaFS3ek"}, {"id": 14, "title": "Using reference photos in Krita", "video_id": "BgQyVA0QKQI"}, {"id": 15, "title": "Face painting - creating a mirror image", "video_id": "search_conartistvids+Krita+15+Face+painting+creating+a+mirror+image"}, {"id": 16, "title": "Face painting - using the Fill tool", "video_id": "search_conartistvids+Krita+16+Face+painting+using+the+Fill+tool"}, {"id": 17, "title": "Face painting - Colorize Mask tool", "video_id": "search_conartistvids+Krita+17+Face+painting+Colorize+Mask+tool"}, {"id": 18, "title": "Face painting - Adding gradients + patterns", "video_id": "search_conartistvids+Krita+18+Face+painting+Adding+gradients+patterns"}, {"id": 19, "title": "Face painting - changing line colour", "video_id": "search_conartistvids+Krita+19+Face+painting+changing+line+colour"}, {"id": 20, "title": "Selecting a shape from a photo", "video_id": "search_conartistvids+Krita+20+selecting+a+shape+from+a+photo"}, {"id": 21, "title": "Blending colours with wet brushes", "video_id": "search_conartistvids+Krita+21+Blending+colours+with+wet+brushes"}, {"id": 22, "title": "Importing reference photos the proper way", "video_id": "search_conartistvids+Krita+22+Importing+reference+photos+the+proper+way"}, {"id": 23, "title": "Tracing over a photo method 1", "video_id": "search_conartistvids+Krita+23+Tracing+over+a+photo+method+1"}, {"id": 24, "title": "Tracing over a photo method 2", "video_id": "search_conartistvids+Krita+24+Tracing+over+a+photo+method+2"}, {"id": 25, "title": "Tracing over a photo method 3", "video_id": "search_conartistvids+Krita+25+Tracing+over+a+photo+method+3"}, {"id": 26, "title": "Using the fantastic Mirror function", "video_id": "search_conartistvids+Krita+26+Using+the+fantastic+Mirror+function"}, {"id": 27, "title": "Using the amazing Multi brush tool", "video_id": "search_conartistvids+Krita+27+Using+the+amazing+Multi+brush+tool"}, {"id": 28, "title": "Introduction to vector lines and shapes", "video_id": "search_conartistvids+Krita+28+Introduction+to+vector+lines+and+shapes"}, {"id": 29, "title": "The Freehand Path tool", "video_id": "search_conartistvids+Krita+29+The+Freehand+Path+tool"}, {"id": 30, "title": "Paintbrush versus Path tool", "video_id": "search_conartistvids+Krita+30+Paintbrush+versus+Path+tool"}, {"id": 31, "title": "Vector Portrait Part 1 Elvis", "video_id": "dQq1a0KjzRk"}, {"id": 32, "title": "Vector Portrait Part 2 Elvis", "video_id": "search_conartistvids+Krita+32+Vector+Portrait+Part+2+Elvis"}, {"id": 33, "title": "Vector Portrait Part 3 Elvis", "video_id": "HpEBoNMGbd0"}, {"id": 34, "title": "Having fun with the Type tool", "video_id": "search_conartistvids+Krita+34+Having+fun+with+the+Type+tool"}, {"id": 35, "title": "Exporting for PRINT and SCREEN", "video_id": "search_conartistvids+Krita+35+Exporting+for+PRINT+and+SCREEN"}];
+
+        window.onload = function() {
+            loadProgress();
+            updateProgress();
+
+            // ESC key to close modal
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeVideo();
+                }
+            });
+        };
+
+        function playVideo(videoId, title, lessonId) {
+            currentVideoId = videoId;
+            currentLessonId = lessonId;
+
+            const modal = document.getElementById('videoModal');
+            const videoFrame = document.getElementById('videoFrame');
+            const modalTitle = document.getElementById('modalTitle');
+
+            modalTitle.textContent = title;
+
+            // Handle different video ID formats
+            if (videoId.startsWith('search_')) {
+                // For videos we need to search for
+                const searchQuery = videoId.replace('search_', '');
+                const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                videoFrame.src = searchUrl;
+            } else {
+                // Direct YouTube video ID
+                videoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+            }
+
+            // Update navigation buttons
+            updateNavigationButtons();
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('videoModal');
+            const videoFrame = document.getElementById('videoFrame');
+
+            modal.classList.remove('show');
+            videoFrame.src = '';
+            document.body.style.overflow = 'auto';
+
+            currentVideoId = null;
+            currentLessonId = null;
+        }
+
+        function updateNavigationButtons() {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+
+            prevButton.disabled = currentLessonId <= 1;
+            nextButton.disabled = currentLessonId >= videoData.length;
+        }
+
+        function previousVideo() {
+            if (currentLessonId > 1) {
+                const prevLesson = videoData.find(video => video.id === currentLessonId - 1);
+                if (prevLesson) {
+                    playVideo(prevLesson.video_id, `Lesson ${prevLesson.id.toString().padStart(2, '0')}: ${prevLesson.title}`, prevLesson.id);
+                }
+            }
+        }
+
+        function nextVideo() {
+            if (currentLessonId < videoData.length) {
+                const nextLesson = videoData.find(video => video.id === currentLessonId + 1);
+                if (nextLesson) {
+                    playVideo(nextLesson.video_id, `Lesson ${nextLesson.id.toString().padStart(2, '0')}: ${nextLesson.title}`, nextLesson.id);
+                }
+            }
+        }
+
+        function markCompleted() {
+            if (currentLessonId) {
+                const checkbox = document.getElementById('tutorial-' + currentLessonId);
+                if (checkbox && !checkbox.checked) {
+                    checkbox.checked = true;
+                    updateProgress();
+                }
+            }
+        }
+
+        function toggleComplete(id) {
+            const checkbox = document.getElementById('tutorial-' + id);
+            checkbox.checked = !checkbox.checked;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            let completedCount = 0;
+
+            checkboxes.forEach((checkbox, index) => {
+                const tutorialItem = checkbox.closest('.tutorial-item');
+                if (checkbox.checked) {
+                    completedCount++;
+                    tutorialItem.classList.add('completed');
+                } else {
+                    tutorialItem.classList.remove('completed');
+                }
+            });
+
+            const total = checkboxes.length;
+            const remaining = total - completedCount;
+            const percentage = Math.round((completedCount / total) * 100);
+
+            document.getElementById('completed-count').textContent = completedCount;
+            document.getElementById('remaining-count').textContent = remaining;
+            document.getElementById('percentage').textContent = percentage + '%';
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-bar').textContent = percentage + '%';
+
+            saveProgress();
+        }
+
+        function saveProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const progress = {};
+            checkboxes.forEach((checkbox) => {
+                progress[checkbox.id] = checkbox.checked;
+            });
+            localStorage.setItem('kritaCourseProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('kritaCourseProgress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                Object.keys(progress).forEach((id) => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) {
+                        checkbox.checked = progress[id];
+                    }
+                });
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                const checkboxes = document.querySelectorAll('.checkbox');
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = false;
+                });
+                localStorage.removeItem('kritaCourseProgress');
+                updateProgress();
+            }
+        }
+
+        // Click outside modal to close
+        document.getElementById('videoModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeVideo();
+            }
+        });
+    </script>
+</body>
+</html>
