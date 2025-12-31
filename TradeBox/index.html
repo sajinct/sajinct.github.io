@@ -45,13 +45,19 @@
 </div>
 	<button onclick="notify()">Notify</button>
 	<script>
-Notification.requestPermission();
+// ask permission once (e.g. on page load or button click)
+if (Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
 
 function notify() {
   new Notification("Intranet Alert", {
     body: "Works without HTTPS & Internet"
   });
 }
+
+// send a notification every 25 seconds
+setInterval(notify, 25000);
 </script>
 	 <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
