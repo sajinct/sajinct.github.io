@@ -45,19 +45,53 @@
 </div>
 	<button onclick="notify()">Notify</button>
 	<script>
-// ask permission once (e.g. on page load or button click)
 if (Notification.permission !== "granted") {
   Notification.requestPermission();
 }
 
+let currentIntervalId;
+
 function notify() {
-  new Notification("Intranet Alert", {
-    body: "Works without HTTPS & Internet"
+  const notification = new Notification("Intranet Alert", {
+    body: "Click X or custom Close button to dismiss. Waits for user action.",
+    icon: "/icon-192x192.png",
+    tag: "intranet-alert",
+    requireInteraction: true  // Waits until user closes (no auto-dismiss)
   });
+  
+  // Additional custom "Close" button (Chrome/Edge only)
+  notification.actions = [{
+    action: 'close',
+    title: 'Close'
+  }];
+  
+  // Handle close events
+  notification.onclose = () => {
+    console.log('Notification closed by user');
+    // Restart interval after user closes
+    if (currentIntervalId) clearInterval(currentIntervalId);
+    currentIntervalId = setInterval(notify, 25000);
+  };
+  
+  notification.onclick = () => {
+    console.log('Notification clicked');
+    window.focus();  // Bring tab to focus
+    notification.close();
+  };
+  
+  // Handle custom action button
+  notification.onshow = () => {
+    setTimeout(() => {
+      notification.onaction = (event) => {
+        if (event.action === 'close') {
+          console.log('Custom Close button clicked');
+          notification.close();
+        }
+      };
+    }, 100);
+  };
 }
 
-// send a notification every 25 seconds
-setInterval(notify, 25000);
 </script>
 	 <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
